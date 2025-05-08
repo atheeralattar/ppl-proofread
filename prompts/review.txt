@@ -1,0 +1,17 @@
+Please conduct a comprehensive review of the following technical content. Your feedback should cover the following aspects:
+
+Accuracy – Identify any technical errors, outdated information, or inconsistencies.
+
+Clarity and Structure – Suggest ways to improve readability, logical flow, formatting, and presentation of ideas.
+
+Completeness – Highlight any missing context, assumptions, or steps that may be unclear to the intended audience.
+
+Optimization Opportunities – Recommend any code, process, or architectural optimizations that could improve performance, maintainability, or scalability.
+
+Tooling and Technology Recommendations – Suggest modern tools, libraries, or frameworks that could simplify, accelerate, or enhance the solution.
+
+Best Practices – Note where industry standards or recommended patterns are not followed, and offer alternatives where appropriate.
+
+Your review should be actionable, precise, and aligned with current best practices in the relevant domain.
+
+%s 

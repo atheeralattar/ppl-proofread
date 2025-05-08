@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"google.golang.org/genai"
 )
@@ -16,6 +17,25 @@ type RequestBody struct {
 
 type ResponseBody struct {
 	Text string `json:"text"`
+}
+
+var (
+	proofreadPrompt string
+	reviewPrompt    string
+)
+
+func init() {
+	// Read prompt files
+	proofreadPrompt = readPromptFile("prompts/proofread.txt")
+	reviewPrompt = readPromptFile("prompts/review.txt")
+}
+
+func readPromptFile(filename string) string {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatalf("Error reading prompt file %s: %v", filename, err)
+	}
+	return string(content)
 }
 
 func main() {
@@ -52,7 +72,7 @@ func handleProofread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prompt := fmt.Sprintf("Please proofread the following text and correct all grammar, spelling, and punctuation errors:\n\n%s", reqBody.Text)
+	prompt := fmt.Sprintf(proofreadPrompt, reqBody.Text)
 
 	result, err := client.Models.GenerateContent(
 		ctx,
@@ -65,7 +85,13 @@ func handleProofread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := ResponseBody{Text: result.Text()}
+	text, err := result.Text()
+	if err != nil {
+		http.Error(w, "Failed to get text from result", http.StatusInternalServerError)
+		return
+	}
+
+	response := ResponseBody{Text: text}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
@@ -92,7 +118,7 @@ func handleReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prompt := fmt.Sprintf("Please review the following text and provide recommendations for improving its content, structure, and clarity:\n\n%s", reqBody.Text)
+	prompt := fmt.Sprintf(reviewPrompt, reqBody.Text)
 
 	result, err := client.Models.GenerateContent(
 		ctx,
@@ -105,7 +131,13 @@ func handleReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := ResponseBody{Text: result.Text()}
+	text, err := result.Text()
+	if err != nil {
+		http.Error(w, "Failed to get text from result", http.StatusInternalServerError)
+		return
+	}
+
+	response := ResponseBody{Text: text}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
