@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Proofreader</title>
+    <!-- Add marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #proofreadBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #reviewBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+            display: none;
+            background-color: #fafafa;
+        }
+        /* Markdown styling */
+        #result h1, #result h2, #result h3 {
+            color: #333;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        #result p {
+            line-height: 1.6;
+            margin-bottom: 1em;
+        }
+        #result ul, #result ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+        #result li {
+            margin-bottom: 0.5em;
+        }
+        #result code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        #result pre {
+            background-color: #f0f0f0;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        #result blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .loading::after {
+            content: "Processing...";
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Proofreader</h1>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        <div class="button-group">
+            <button id="proofreadBtn" onclick="proofread()">Proofread</button>
+            <button id="reviewBtn" onclick="review()">Content Review</button>
+        </div>
+        <div class="loading" id="loading"></div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Configure marked options
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        async function proofread() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('Please enter some text to proofread');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/proofread', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const result = await response.json();
+                displayResult(result.text);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while proofreading');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function review() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('Please enter some text to review');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/review', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const result = await response.json();
+                displayResult(result.text);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while reviewing');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResult(text) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            // Parse markdown and set as HTML
+            resultDiv.innerHTML = marked.parse(text);
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
