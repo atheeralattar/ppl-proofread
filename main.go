@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go-proof/prompts"
 	"log"
 	"net/http"
-	"os"
 
 	"google.golang.org/genai"
 )
@@ -17,25 +17,6 @@ type RequestBody struct {
 
 type ResponseBody struct {
 	Text string `json:"text"`
-}
-
-var (
-	proofreadPrompt string
-	reviewPrompt    string
-)
-
-func init() {
-	// Read prompt files
-	proofreadPrompt = readPromptFile("prompts/proofread.txt")
-	reviewPrompt = readPromptFile("prompts/review.txt")
-}
-
-func readPromptFile(filename string) string {
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Error reading prompt file %s: %v", filename, err)
-	}
-	return string(content)
 }
 
 func main() {
@@ -72,7 +53,7 @@ func handleProofread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prompt := fmt.Sprintf(proofreadPrompt, reqBody.Text)
+	prompt := fmt.Sprintf(prompts.ProofreadPrompt, reqBody.Text)
 
 	result, err := client.Models.GenerateContent(
 		ctx,
@@ -118,7 +99,7 @@ func handleReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prompt := fmt.Sprintf(reviewPrompt, reqBody.Text)
+	prompt := fmt.Sprintf(prompts.ReviewPrompt, reqBody.Text)
 
 	result, err := client.Models.GenerateContent(
 		ctx,
