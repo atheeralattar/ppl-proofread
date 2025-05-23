@@ -112,11 +112,48 @@
             content: "Processing...";
             color: #666;
         }
+        .model-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+        
+        .model-selector label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Text Proofread and Review</h1>
+        
+        <div class="model-selector">
+            <label for="modelSelect">Select Model:</label>
+            <select id="modelSelect">
+                <option value="llama3:latest">Llama 3</option>
+                <option value="deepseek-v2">Deepseek V2</option>
+       
+            </select>
+        </div>
+        
         <textarea id="inputText" placeholder="Enter your text here..."></textarea>
         <div class="button-group">
             <button id="proofreadBtn" onclick="proofread()">Proofread</button>
@@ -135,6 +172,8 @@
 
         async function proofread() {
             const text = document.getElementById('inputText').value;
+            const model = document.getElementById('modelSelect').value;
+            
             if (!text) {
                 alert('Please enter some text to proofread');
                 return;
@@ -147,7 +186,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: text })
+                    body: JSON.stringify({ 
+                        text: text,
+                        model: model 
+                    })
                 });
 
                 const result = await response.json();
@@ -162,6 +204,8 @@
 
         async function review() {
             const text = document.getElementById('inputText').value;
+            const model = document.getElementById('modelSelect').value;
+            
             if (!text) {
                 alert('Please enter some text to review');
                 return;
@@ -174,7 +218,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: text })
+                    body: JSON.stringify({ 
+                        text: text,
+                        model: model 
+                    })
                 });
 
                 const result = await response.json();
