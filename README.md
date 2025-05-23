@@ -123,4 +123,3 @@ The application supports the following models through Ollama:
 ## Contributing
 
 Feel free to submit issues and enhancement requests!
-
